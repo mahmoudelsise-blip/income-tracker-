@@ -347,7 +347,7 @@ class MainActivity : Activity() {
             setHintTextColor(muted)
             this.hint = hint
             inputType = type
-            singleLine = true
+            isSingleLine = true
             gravity = Gravity.CENTER_VERTICAL or Gravity.RIGHT
             layoutDirection = View.LAYOUT_DIRECTION_RTL
             background = rounded(panel, 13)
