@@ -21,27 +21,20 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Find and build Android project
-        shell: bash
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
         run: |
-          GRADLEW="$(find . -type f -name gradlew -not -path './.git/*' -print -quit)"
-
-          if [ -z "$GRADLEW" ]; then
-            echo "::error::gradlew file not found"
-            echo "Project files:"
-            find shoghlaty-android -maxdepth 4 -type f | sort | head -200
-            exit 1
-          fi
-
-          PROJECT_DIR="$(dirname "$GRADLEW")"
-          cd "$PROJECT_DIR"
-          chmod +x ./gradlew
-          ./gradlew assembleDebug
+          cd shoghlaty-android
+          gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: income-tracker-apk
-          path: '**/build/outputs/apk/debug/*.apk'
+          path: shoghlaty-android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           
