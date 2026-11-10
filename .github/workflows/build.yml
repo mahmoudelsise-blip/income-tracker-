@@ -16,20 +16,32 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Build APK
+      - name: Find and build Android project
+        shell: bash
         run: |
-          cd shoghlaty-android
-          chmod +x gradlew
+          GRADLEW="$(find . -type f -name gradlew -not -path './.git/*' -print -quit)"
+
+          if [ -z "$GRADLEW" ]; then
+            echo "::error::gradlew file not found"
+            echo "Project files:"
+            find shoghlaty-android -maxdepth 4 -type f | sort | head -200
+            exit 1
+          fi
+
+          PROJECT_DIR="$(dirname "$GRADLEW")"
+          cd "$PROJECT_DIR"
+          chmod +x ./gradlew
           ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: income-tracker-apk
-          path: shoghlaty-android/**/build/outputs/apk/debug/*.apk
+          path: '**/build/outputs/apk/debug/*.apk'
+          if-no-files-found: error
           
